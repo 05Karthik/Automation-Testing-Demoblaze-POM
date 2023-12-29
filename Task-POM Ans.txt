@@ -1,0 +1,506 @@
+package Pageobject;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+
+public class LoginPage {
+	
+
+	//create a webdriver variable
+	public WebDriver driver;
+	
+	//Initialize the pageFactory to init method
+	public LoginPage(WebDriver driver) {
+		this.driver=driver;
+		PageFactory.initElements(driver, this);
+	}
+	
+		//locate the element in signupPage
+		
+		//loginbtn homepage
+		@FindBy(id="login2")
+		WebElement loginbtnhome;
+		//username
+		@FindBy(id="loginusername")
+		WebElement loginusernamefield;
+		//password	
+		@FindBy(id="loginpassword")
+		WebElement loginpasswordfield;
+		//loginbtn
+		@FindBy(xpath="//button[.='Log in']")
+		WebElement loginbtn;
+		//usernameverify
+		@FindBy(xpath="//a[@id='nameofuser']")
+		WebElement username;
+				
+		public void loginbtnhome(){
+			loginbtnhome.click();
+			
+		}
+		public void getusername(String username) {
+			loginusernamefield.sendKeys(username);
+		}
+		
+		public void getpassword(String password) {
+			loginpasswordfield.sendKeys(password);
+		}
+		public void clickloginbtn() {
+			loginbtn.click();
+		}
+		public String username_verify() {
+			String name=username.getText();
+			System.out.println(name);
+			return name;
+		}
+		
+	}
+
+
+------------------------------------------------------------------------------------------
+
+package Pageobject;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.FindBy;
+
+public class SignupPage {
+	
+	//create a webdriver variable
+	public WebDriver driver;
+	
+	//Initialize the pageFactory to init method
+	public SignupPage(WebDriver driver) {
+		this.driver=driver;
+		PageFactory.initElements(driver, this);
+		
+	}
+	
+	//locate the element in signupPage
+	
+	//signupbtn homepage
+	@FindBy(id="signin2")
+	WebElement signupbtnhome;
+	//username
+	@FindBy(id="sign-username")
+	WebElement usernamefield;
+	//password	
+	@FindBy(id="sign-password")
+	WebElement passwordfield;
+	//signupbtn
+	@FindBy(xpath="//button[.='Sign up']")
+	WebElement signupbtn;
+	//closebtn
+	@FindBy(xpath="(//button[.='Close'])[2]")
+	WebElement signupclosebtn;
+	
+	
+	public void Signuphome(){
+		signupbtnhome.click();
+		
+}
+	public void getusername(String username) {
+		usernamefield.sendKeys(username);
+	}
+	
+	public void getpassword(String password) {
+		passwordfield.sendKeys(password);
+	}
+	public void clicksignupbtn() {
+		signupbtn.click();
+	}
+	
+	public void verify() {
+		
+	}
+	
+	
+	
+	
+
+
+}
+
+----------------------------------------------------------------------------------
+data.properties
+
+Browser=chrome
+url=https://www.demoblaze.com/
+username=task9
+invalidusername=
+password=abc123
+invalidpassword=
+
+-----------------------------------------------------------------
+package Utilities;
+
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+
+public class ExtentReportdemoblaze {
+	
+	//method to create an object for generate report
+	    public static ExtentReports getExtentReports() {
+	    	
+	    	String extentReportpath=System.getProperty("user+dir")+ "\\Reports\\extentreport.html";
+	    	
+	    	//create a object of extentspark report
+	    	ExtentSparkReporter reporter=new ExtentSparkReporter(extentReportpath);
+	    	
+	    	//set the report name
+	    	reporter.config().setReportName("DemoBlaze");
+	    	reporter.config().setDocumentTitle("DemoBlaze Automation Test Results");
+	    	
+	    	//create a object of extent report
+	    	ExtentReports extentreport=new ExtentReports();
+	    	
+	    	extentreport.attachReporter(reporter);
+	    	
+	    	
+			return extentreport;
+	    	
+	    }
+
+}
+-------------------------------------------------------------------------------------
+
+package Utilities;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Properties;
+import java.util.Set;
+
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import io.github.bonigarcia.wdm.WebDriverManager;
+
+public class Utility {
+	public static WebDriver driver;
+	public Properties prop;
+	
+	//To develop a function to select browser
+	public WebDriver initializeDriver() throws IOException {
+		//use the property
+		prop=new Properties();
+		//path to property
+		String proppath=System.getProperty("user.dir")+"\\src\\main\\java\\Resources\\data.properties";
+		//create file input stream object
+		FileInputStream fis=new FileInputStream(proppath);
+		prop.load(fis); // we get data from data.properties
+		
+		//create a code for browser selection
+		String choicebrowser="chrome";
+		if(choicebrowser.equals("chrome")) {
+			WebDriverManager.chromedriver().setup();
+			driver=new ChromeDriver();
+		}else if(choicebrowser.equals("fiefox")) {
+			WebDriverManager.firefoxdriver().setup();
+			driver=new FirefoxDriver();
+		}else if(choicebrowser.equals("ie")) {
+			WebDriverManager.iedriver().setup();
+			driver=new InternetExplorerDriver();
+		}else {
+			System.out.println("Invalid Browser Selection");
+			System.exit(1);
+		}	
+		//To Window maximize and delete cookies
+			driver.manage().window().maximize();
+			driver.manage().deleteAllCookies();	
+		//implicit wait
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+			
+		return driver;
+		
+	}
+
+
+	//Add fuctionality to take screenshot
+		public static String TakeScreenshot(String testname) throws IOException {
+		File srcscreenshot=((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+		//Path to get screenshot
+		String screenshotfilepath=System.getProperty("user.dir")+"\\Screenshot\\"+testname+".png";
+		//copy the file
+		FileUtils.copyFile(srcscreenshot, new File(screenshotfilepath));		
+		return screenshotfilepath;
+		
+		}	
+		
+	//Switch to window
+		public static void SwitchWindow() {
+			String parentwindow=driver.getWindowHandle();
+			Set<String> windowhandles=driver.getWindowHandles();
+			windowhandles.size();
+	//through windows		
+			for(String childwindow:windowhandles) {
+				if(!childwindow.contentEquals(parentwindow)) {
+					driver.switchTo().window(childwindow);
+				}
+			}
+	
+		}
+		
+	//Function to wait for an element to be Clickable
+		public static WebElement waitforElementTobeClickable(By locator,int timeoutinseconds) {
+			WebDriverWait wait= new WebDriverWait(driver,Duration.ofSeconds(timeoutinseconds));
+			return wait.until(ExpectedConditions.elementToBeClickable(locator));
+
+	}
+		
+}		
+
+---------------------------------------------------------------------------------------------------
+
+package Base;
+
+import java.io.IOException;
+
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+
+import Utilities.Utility;
+
+public class Baseclass extends Utility{
+	
+	//Write code for starting and closing Browser
+	
+	@BeforeMethod
+	public void startup() throws IOException {
+		driver=initializeDriver();
+	//send the url
+		driver.get(prop.getProperty("url"));
+	
+		}
+	
+	@AfterMethod
+	public void close() {
+		driver.quit();
+	
+		}	
+}
+
+----------------------------------------------------------------------------------
+
+package Listen;
+
+import java.io.IOException;
+
+import org.testng.ITestContext;
+import org.testng.ITestListener;
+import org.testng.ITestResult;
+
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
+
+import Base.Baseclass;
+import Utilities.ExtentReportdemoblaze;
+import Utilities.Utility;
+
+public class Listener extends Baseclass implements ITestListener{
+	//WebDriver driver;
+	
+	//create an extent report object
+	ExtentReports extentReport=ExtentReportdemoblaze.getExtentReports();
+	//initialize the extent variable
+	ExtentTest extentTest;
+	
+	//call all the method for which we want to execute
+	
+	@Override
+	public void onTestStart(ITestResult result) {
+		extentTest=extentReport.createTest(result.getName());
+	}
+	
+	//method execute to before successful each test
+	@Override
+	public void onTestSuccess(ITestResult result) {
+		//log the status 
+				//get the name of failed test case
+				String testName=result.getName();
+				try {
+					String screenshotPath=Utility.TakeScreenshot(testName);
+					extentTest.addScreenCaptureFromPath(screenshotPath,testName);
+					
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				extentTest.log(Status.PASS, "Test Passed");
+			}
+		
+	
+	//create a method to test failure
+	@Override
+	public void onTestFailure(ITestResult result) {
+		extentTest.fail(result.getThrowable());
+		//get the name of failed test case
+		String testName=result.getName();
+		//Logic for screenshot capture	
+			extentTest.fail(result.getThrowable());
+		
+		try {
+			String screenshotPath=Utility.TakeScreenshot(testName);
+			extentTest.addScreenCaptureFromPath(screenshotPath,testName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void onFinish(ITestContext context) {
+		//flush the extent  to write the data to report file
+		extentReport.flush();
+	}
+}
+
+-------------------------------------------------------------------------------
+
+package Testcases;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+import Base.Baseclass;
+import Pageobject.LoginPage;
+
+public class LoginTest extends Baseclass{
+	
+	@Test
+	
+	public void Login_with_Valid_Credentials() throws InterruptedException {
+	//create an object of Login class
+	LoginPage Login=new LoginPage(driver);
+	Login.loginbtnhome();
+	Thread.sleep(2000);
+	Login.getusername(prop.getProperty("username"));
+	Thread.sleep(2000);
+	Login.getpassword(prop.getProperty("password"));
+	Login.clickloginbtn();
+	Thread.sleep(9000);
+	
+}
+	@Test
+	public void username_verify() {
+		LoginPage Login=new LoginPage(driver);
+		Assert.assertEquals(Login.username_verify(),"Welcome task9");
+	}
+
+@Test
+	public void Login_with_invalid_Credentials() throws InterruptedException {
+	//create an object of Login class
+		LoginPage Login=new LoginPage(driver);
+		Login.loginbtnhome();
+		Thread.sleep(2000);
+		Login.getusername(prop.getProperty("invalidusername"));
+		Thread.sleep(2000);
+		Login.getpassword(prop.getProperty("invalidpassword"));
+		Login.clickloginbtn();
+
+}
+@Test
+	public void Login_with_valid_username_invalid_password() throws InterruptedException {
+	//create an object of Login class
+		LoginPage Login=new LoginPage(driver);
+		Login.loginbtnhome();
+		Thread.sleep(2000);
+		Login.getusername(prop.getProperty("validusername"));
+		Thread.sleep(2000);
+		Login.getpassword(prop.getProperty("invalidpassword"));
+		Login.clickloginbtn();
+}	
+@Test
+	public void Login_with_invalid_username_valid_password() throws InterruptedException {
+	//create an object of Login class
+	LoginPage Login=new LoginPage(driver);
+	Login.loginbtnhome();
+	Thread.sleep(2000);
+	Login.getusername(prop.getProperty("invalidusername"));
+	Thread.sleep(2000);
+	Login.getpassword(prop.getProperty("validpassword"));
+	Login.clickloginbtn();
+}	
+	
+}
+
+---------------------------------------------------------------------------------------------
+
+package Testcases;
+
+import org.testng.annotations.Test;
+
+import Base.Baseclass;
+import Pageobject.SignupPage;
+
+public class SignupTest extends Baseclass{
+	
+@Test
+	
+		public void signup_with_Valid_Credentials() throws InterruptedException {
+		//create an object of signup class
+		SignupPage signup=new SignupPage(driver);
+		signup.Signuphome();
+		Thread.sleep(2000);
+		signup.getusername(prop.getProperty("username"));
+		Thread.sleep(2000);
+		signup.getpassword(prop.getProperty("password"));
+		signup.clicksignupbtn();
+		Thread.sleep(2000);
+	}
+
+@Test
+		public void signup_with_invalid_Credentials() throws InterruptedException {
+		//create an object of signup class
+			SignupPage signup=new SignupPage(driver);
+			signup.Signuphome();
+			Thread.sleep(2000);
+			signup.getusername(prop.getProperty("invalidusername"));
+			Thread.sleep(2000);
+			signup.getpassword(prop.getProperty("invalidpassword"));
+			signup.clicksignupbtn();
+			Thread.sleep(2000);
+	
+	}
+@Test
+		public void signup_with_valid_username_invalid_password() throws InterruptedException {
+		//create an object of signup class
+			SignupPage signup=new SignupPage(driver);
+			signup.Signuphome();
+			Thread.sleep(2000);
+			signup.getusername(prop.getProperty("validusername"));
+			Thread.sleep(2000);
+			signup.getpassword(prop.getProperty("invalidpassword"));
+			signup.clicksignupbtn();
+			Thread.sleep(2000);
+	}	
+@Test
+		public void signup_with_invalid_username_valid_password() throws InterruptedException {
+		//create an object of signup class
+		SignupPage signup=new SignupPage(driver);
+		signup.Signuphome();
+		Thread.sleep(2000);
+		signup.getusername(prop.getProperty("invalidusername"));
+		Thread.sleep(2000);
+		signup.getpassword(prop.getProperty("validpassword"));
+		signup.clicksignupbtn();
+		Thread.sleep(2000);
+	}	
+
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
